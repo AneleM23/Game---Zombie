@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class PlayerContoroller : MonoBehaviour
 {
-    public float moveSpeed = 5f;     
-    public float jumpHeight = 2f;    
-    public GameObject bulletPrefab;  
-    public Transform firePoint;      
-    public float bulletSpeed = 10f;  
+    public float moveSpeed = 5f;
+    public float jumpHeight = 2f;
+    public GameObject bulletPrefab;
+    public Transform firePoint;
+    public float bulletSpeed = 10f;
 
-    private bool isGrounded = false; 
+    private bool isGrounded = false;
 
     private Rigidbody2D rb;
     private Animator animator;
@@ -33,13 +33,13 @@ public class PlayerContoroller : MonoBehaviour
         float moveInput = Input.GetAxis("Horizontal");
         rb.velocity = new Vector2(moveInput * moveSpeed, rb.velocity.y);
 
-        
+        // Flip the character based on the movement direction
         if (moveInput > 0)
             transform.localScale = new Vector3(2, 2, 2);
         else if (moveInput < 0)
             transform.localScale = new Vector3(-2, 2, 2);
 
-       
+        // Update animator parameters
         animator.SetFloat("Speed", Mathf.Abs(moveInput));
     }
 
@@ -49,21 +49,16 @@ public class PlayerContoroller : MonoBehaviour
         {
             float jumpForce = Mathf.Sqrt(2 * Mathf.Abs(Physics2D.gravity.y) * jumpHeight);
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-            isGrounded = false; 
+            isGrounded = false;
             Debug.Log("Jump!");
         }
     }
 
     void Shoot()
     {
-        if (Input.GetKeyDown(KeyCode.LeftControl)) 
+        if (Input.GetKeyDown(KeyCode.LeftControl))
         {
-          //  animator.SetBool("IsShooting", true);
             FireBullet();
-        }
-        else
-        {
-           // animator.SetBool("IsShooting", false);
         }
     }
 
@@ -89,7 +84,6 @@ public class PlayerContoroller : MonoBehaviour
                 // bulletRb.AddForce(shootDirection * bulletSpeed, ForceMode2D.Impulse);
             }
         }
-
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -109,8 +103,5 @@ public class PlayerContoroller : MonoBehaviour
             Debug.Log("Not Grounded");
         }
     }
-
-
-
-
 }
+
