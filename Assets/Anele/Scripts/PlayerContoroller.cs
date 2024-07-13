@@ -11,6 +11,8 @@ public class PlayerContoroller : MonoBehaviour
     public float bulletSpeed = 10f;
 
     private bool isGrounded = false;
+    private bool canDoubleJump = false;
+    private Vector2 respawnPoint;
 
     private Rigidbody2D rb;
     private Animator animator;
@@ -19,6 +21,7 @@ public class PlayerContoroller : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        respawnPoint = transform.position; // Initialize respawn point to the starting position
     }
 
     void Update()
@@ -45,12 +48,23 @@ public class PlayerContoroller : MonoBehaviour
 
     void Jump()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            float jumpForce = Mathf.Sqrt(2 * Mathf.Abs(Physics2D.gravity.y) * jumpHeight);
-            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
-            isGrounded = false;
-            Debug.Log("Jump!");
+            if (isGrounded)
+            {
+                float jumpForce = Mathf.Sqrt(2 * Mathf.Abs(Physics2D.gravity.y) * jumpHeight);
+                rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+                isGrounded = false;
+                canDoubleJump = true;
+                Debug.Log("Jump!");
+            }
+            else if (canDoubleJump)
+            {
+                float jumpForce = Mathf.Sqrt(2 * Mathf.Abs(Physics2D.gravity.y) * jumpHeight);
+                rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+                canDoubleJump = false;
+                Debug.Log("Double Jump!");
+            }
         }
     }
 
@@ -79,9 +93,6 @@ public class PlayerContoroller : MonoBehaviour
 
                 // Set the bullet's velocity in the shoot direction
                 bulletRb.velocity = shootDirection * bulletSpeed;
-
-                // Optionally, you can add a small force to the bullet to make sure it moves
-                // bulletRb.AddForce(shootDirection * bulletSpeed, ForceMode2D.Impulse);
             }
         }
     }
@@ -91,6 +102,7 @@ public class PlayerContoroller : MonoBehaviour
         if (collision.collider.CompareTag("Ground"))
         {
             isGrounded = true;
+            canDoubleJump = true; // Reset double jump when grounded
             Debug.Log("Grounded");
         }
     }
@@ -103,5 +115,17 @@ public class PlayerContoroller : MonoBehaviour
             Debug.Log("Not Grounded");
         }
     }
+
+    public void SetCheckpoint(Vector2 checkpointPosition)
+    {
+        respawnPoint = checkpointPosition;
+    }
+
+    public void Respawn()
+    {
+        transform.position = respawnPoint;
+        rb.velocity = Vector2.zero; // Reset the player's velocity to prevent carryover from before respawn
+    }
+
 }
 
