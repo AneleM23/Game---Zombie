@@ -5,7 +5,7 @@ using UnityEngine.Tilemaps;
 
 public class BulletBehavior : MonoBehaviour
 {
-    private void OnTriggerEnter2D(Collider2D other)
+    public void OnTriggerEnter2D(Collider2D other)
     {
         // Check if the bullet has collided with an enemy
         if (other.CompareTag("Enemy"))
@@ -33,7 +33,7 @@ public class BulletBehavior : MonoBehaviour
         }
     }
 
-    private void OnBecameInvisible()
+    public void OnBecameInvisible()
     {
         // Destroy the bullet when it goes off-screen (camera view point)
         Destroy(gameObject);
