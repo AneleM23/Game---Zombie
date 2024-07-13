@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class BulletBehavior : MonoBehaviour
 {
-    private void OnTriggerEnter2D(Collider2D other)
+    public void OnTriggerEnter2D(Collider2D other)
     {
         // Check if the bullet has collided with an enemy
         if (other.CompareTag("Enemy"))
         {
-            Destroy(other.gameObject); 
-            Destroy(gameObject); 
+            Destroy(other.gameObject);
+            Destroy(gameObject);
         }
         else if (other.CompareTag("Obstacle") || other.CompareTag("Ground"))
         {
@@ -19,11 +19,9 @@ public class BulletBehavior : MonoBehaviour
         }
     }
 
-    private void OnBecameInvisible()
+    public void OnBecameInvisible()
     {
         // Destroy the bullet when it goes off-screen (camera view point)
         Destroy(gameObject);
     }
-
-
 }
