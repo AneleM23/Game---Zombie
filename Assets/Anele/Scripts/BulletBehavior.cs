@@ -1,17 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;        
+using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class BulletBehavior : MonoBehaviour
 {
+    public GameObject coinPrefab; // Reference to the coin prefab
+
     public void OnTriggerEnter2D(Collider2D other)
     {
         // Check if the bullet has collided with an enemy
         if (other.CompareTag("Enemy"))
         {
-            Destroy(other.gameObject);
-            Destroy(gameObject);
+            // Instantiate the coin prefab at the enemy's position
+            Instantiate(coinPrefab, other.transform.position, Quaternion.identity);
+
+            Destroy(other.gameObject); // Destroy the enemy
+            Destroy(gameObject); // Destroy the bullet
         }
         else if (other.CompareTag("Obstacle") || other.CompareTag("Ground"))
         {

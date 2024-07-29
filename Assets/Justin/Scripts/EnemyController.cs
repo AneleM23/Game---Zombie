@@ -8,18 +8,23 @@ public class EnemyController : MonoBehaviour
     public float speed = 2f;
     public int maxHealth = 3;
     public Transform target;
+    public float detectionRange = 5f;
+    public float attackCooldown = 1.5f;
+    public int damage = 1;
+    public GameObject stonePrefab;
+    public float stoneSpeed = 10f;
+    public Transform stoneSpawnPoint;
     public enum EnemyType { Easy, Medium, Hard }
     public EnemyType enemyType;
-    public GameObject coinPrefab;
+    public GameObject pointPrefab;
     public GameObject healthPrefab;
     public GameObject ammoPrefab;
 
     private int currentHealth;
     private Rigidbody2D rb;
     public Animator animator;
-    public bool isWalking;
-    public bool isAttacking;
-    public bool isDead;
+    [SerializeField] private bool isAttacking = false;
+    private float attackTimer = 0f;
 
     void Start()
     {
@@ -30,32 +35,50 @@ public class EnemyController : MonoBehaviour
 
     void Update()
     {
-        if (!isDead)
+        if (target != null && !isAttacking)
         {
-            MoveTowardsTarget();
+            float distanceToTarget = Vector2.Distance(transform.position, target.position);
+            if (distanceToTarget <= detectionRange)
+            {
+                Attack();
+            }
         }
+
+        if (isAttacking)
+        {
+            attackTimer += Time.deltaTime;
+            if (attackTimer >= attackCooldown)
+            {
+                isAttacking = false;
+                attackTimer = 0f;
+            }
+        }
+
         Animate();
     }
 
-    void MoveTowardsTarget()
+    void Attack()
     {
-        if (target != null)
+        isAttacking = true;
+        animator.SetBool("isAttacking", true);
+        ThrowStone();
+    }
+
+    void ThrowStone()
+    {
+        if (stonePrefab != null && stoneSpawnPoint != null)
         {
-            Vector2 direction = (target.position - transform.position).normalized;
-            rb.velocity = direction * speed;
-            isWalking = true;
-        }
-        else
-        {
-            isWalking = false;
+            GameObject stone = Instantiate(stonePrefab, stoneSpawnPoint.position, stoneSpawnPoint.rotation);
+            Rigidbody2D stoneRb = stone.GetComponent<Rigidbody2D>();
+            Vector2 direction = (target.position - stoneSpawnPoint.position).normalized;
+            stoneRb.velocity = direction * stoneSpeed;
         }
     }
 
     void Animate()
     {
-        animator.SetBool("isWalking", isWalking);
+        animator.SetBool("isWalking", false);
         animator.SetBool("isAttacking", isAttacking);
-        animator.SetBool("isDead", isDead);
     }
 
     public void TakeDamage(int damage)
@@ -69,7 +92,8 @@ public class EnemyController : MonoBehaviour
 
     void Die()
     {
-        isDead = true;
+        isAttacking = false;
+        animator.SetBool("isDead", true);
         DropResource();
         Destroy(gameObject, 1f); // Delay destruction to allow the death animation to play
     }
@@ -79,7 +103,7 @@ public class EnemyController : MonoBehaviour
         switch (enemyType)
         {
             case EnemyType.Easy:
-                Instantiate(coinPrefab, transform.position, Quaternion.identity);
+                Instantiate(pointPrefab, transform.position, Quaternion.identity);
                 break;
             case EnemyType.Medium:
                 Instantiate(healthPrefab, transform.position, Quaternion.identity);
@@ -90,20 +114,21 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    void OnTriggerEnter2D(Collider2D other)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
-            isAttacking = true;
-            // Implement attack behavior here
+            target = other.transform;
         }
     }
 
-    void OnCollisionExit2D(Collision2D collision)
+    void OnTriggerExit2D(Collider2D other)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
+            target = null;
             isAttacking = false;
         }
     }
+
 }

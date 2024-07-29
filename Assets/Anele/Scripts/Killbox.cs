@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Killbox : MonoBehaviour
 {
+   public  PlayerHealth playerHealth;
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
@@ -13,6 +15,7 @@ public class Killbox : MonoBehaviour
             {
                 player.Respawn();
                 Debug.Log("Player has respawned.");
+                playerHealth.TakeDamage(1);
             }
         }
         else

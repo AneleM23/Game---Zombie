@@ -8,7 +8,7 @@ public class Coin : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            collision.GetComponent<PlayerController>().points += 10;
+            collision.GetComponent<PlayerHealth>().coinCount += 10;
             Destroy(gameObject);
         }
     }

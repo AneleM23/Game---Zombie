@@ -8,6 +8,9 @@ TagManager:
   - Coin
   - Health
   - Gun
+  - Obstacle
+  - Ground
+  - Enemy
   layers:
   - Default
   - TransparentFX
